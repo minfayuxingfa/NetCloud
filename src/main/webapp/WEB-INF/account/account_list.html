@@ -265,7 +265,7 @@ function splitePage(number) {
 
 
     for (var num = 1; num <= number; num++) {
-        $("<a href='###' " +
+        $("<a id='pageNum' href='###' " +
             "class='num'></a>").html(num).appendTo(str).attr("num", num).click(page);
     }
 
@@ -278,7 +278,7 @@ function splitePage(number) {
 
 //分页的点击事件
 var page= function() {
-    $("a").removeAttr("class");
+    $(".color").removeAttr("class");
     $(this).attr("class","color");
     var number = $(this).attr("num");
 
@@ -371,7 +371,7 @@ $("#startSearch").click(function () {
 //    模糊查询 添加分页
 
     function searchSplit(number){
-        var str = $("<li class='split'></li>");
+        var str = $("<div class='split'></div>");
         var str1 = $("<a href='#' aria-label='Previous'></a>").appendTo(str);
         $("<span aria-hidden='true'>&laquo;</span>").appendTo(str1);
 
@@ -392,7 +392,7 @@ $("#startSearch").click(function () {
 
 //模糊查询分页的点击事件
 var searchPage= function() {
-    $("a").removeAttr("class");
+    $(".color").removeAttr("class");
     $(this).attr("class","color");
     var number = $(this).attr("num");
 
