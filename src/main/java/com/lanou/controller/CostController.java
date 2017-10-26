@@ -194,4 +194,11 @@ public class CostController {
         Cost cost = (Cost) request.getSession().getAttribute("UpdateCost");
         return new AjaxResult(cost);
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/getAllAccountName",method = RequestMethod.POST)
+    public AjaxResult getAllAccountName(){
+        List<Cost> costs = costService.selectAllCost();
+        return new AjaxResult(costs);
+    }
 }

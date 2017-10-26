@@ -38,6 +38,13 @@
     where account_id = #{accountId,jdbcType=INTEGER}
   </select>
 
+  <select id="selectByIdCard" parameterType="com.lanou.bean.Account" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from account
+    where idcard_no = #{idcardNo}
+  </select>
+
   <select id="selectAllAccount" parameterType="com.lanou.bean.Account" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />

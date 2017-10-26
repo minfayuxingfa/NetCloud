@@ -9,7 +9,7 @@ public interface ServiceMapper {
 
     int insert(Service record);
 
-    int insertSelective(Service record);
+    int insertSelective(Service service);
 
     Service selectByPrimaryKey(Integer serviceId);
 

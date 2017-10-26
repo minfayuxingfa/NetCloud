@@ -34,7 +34,6 @@
 <!--导航区域结束-->
 <!--主要区域开始-->
 <div id="main">
-    <form action="" method="">
         <!--查询-->
         <div class="search_add">
             <div>OS 账号：<input type="text" value="" class="width100 text_search"/></div>
@@ -80,18 +79,8 @@
                 6、暂停和删除状态的账务账号下属的业务账号不能被开通。</p>
         </div>
         <!--分页-->
-        <div id="pages">
-            <a href="#">首页</a>
-            <a href="#">上一页</a>
-            <a href="#" class="current_page">1</a>
-            <a href="#">2</a>
-            <a href="#">3</a>
-            <a href="#">4</a>
-            <a href="#">5</a>
-            <a href="#">下一页</a>
-            <a href="#">末页</a>
-        </div>
-    </form>
+    <div id="pages">
+    </div>
 </div>
 <!--主要区域结束-->
 <div id="footer">
@@ -99,7 +88,30 @@
     <p>版权所有(C)云科技有限公司 </p>
 </div>
 </body>
+<style type="text/css">
+    .color{
+        background-color: red;
+    }
+    .colour{
+        color: #0a97ff;
+    }
+</style>
 <script language="javascript" type="text/javascript">
+   //显示详细的Account
+    var serviceDetail=function () {
+         $.ajax({
+             url:"/getServiceDetailService",
+             type:"post",
+             data: {
+                serviceId : $(this).html()
+             },
+             success:function (result) {
+          if (result.data==1){
+              window.location.href="/toServiceDetail";
+          }
+             }
+         })
+    }
 
     //查询所有的service
     function selectAllService() {
@@ -107,8 +119,20 @@
             url: "/selectAllService",
             type: "post",
             success: function (result) {
+
+                $.ajax({
+                    url:"/servicePage",
+                    type:"post",
+                    data:{
+                        pagesize:4
+                    },
+                    success:function (result) {
+                        splitePage(result.pages)
+                    }
+                });
+
                 var serviceList = result.data;
-                for (var i = 0; i < serviceList.length; i++) {
+                for (var i = 0; i < 4; i++) {
                     addNewService(serviceList[i])
                 }
             }
@@ -116,22 +140,59 @@
         })
     }
 
+    //分页
+    function splitePage(number) {
+        var str = $("<div class='split'></div>");
+        $("<a href='#'></a>").html("首页").appendTo(str);
+        $("<a href='#'></a>").html("上一页").appendTo(str);
+        for (var num = 1; num <= number; num++) {
+            $("<a id='pageNum' href='###'></a>").html(num).appendTo(str).attr("num", num).click(page);
+        }
+        $("<a href='#'></a>").html("下一页").appendTo(str);
+        $("<a href='#'></a>").html("末页").appendTo(str);
+        $("#pages").append(str)
+
+    }
+
+    //分页的点击事件
+    var page= function() {
+        $(".color").removeAttr("class");
+        $(this).attr("class","color");
+        var number = $(this).attr("num");
+
+        $(".text").remove();
+        $.ajax({
+            url: "/selectAllService",
+            type:"post",
+            success: function (res) {
+                var CostList = res.data;
+                for (var i = 4 * (number - 1); i < 4 * number; i++) {
+                    var msg = CostList[i];
+                    addNewService(msg)
+                }
+            }
+        })
+
+    }
+
+
     //   添加新的service
     function addNewService(services) {
 
         var status;
-        if (services.account.status == 1) {
+        if (services.status == 1) {
             status = "开通";
-        } else if (services.account.status == 2) {
+        } else if (services.status == 2) {
             status = "暂停";
         }else {
             status="删除";
         }
 
-        var tr1 = $("<tr></tr>");
-        $("<td></td>").html(services.serviceId).appendTo(tr1);
+        var tr1 = $("<tr class='text'></tr>");
+
         var td1 = $("<td></td>").appendTo(tr1);
-        $("<a href='##'></a>").html(services.account.accountId).appendTo(td1);
+        $("<a href='##'></a>").html(services.serviceId).click(serviceDetail).appendTo(td1);
+        $("<td></td>").html(services.account.accountId).appendTo(tr1);
         $("<td></td>").html(services.account.idcardNo).appendTo(tr1);
         $("<td></td>").html(services.account.realName).appendTo(tr1);
         $("<td></td>").html(services.osUsername).appendTo(tr1);
@@ -143,14 +204,25 @@ $("<a class='summary' onmouseover='showDetail(true,this);' onmouseout='showDetai
     .html(services.cost.name).appendTo(td2);
         $(" <div class='detail_info'></div>").html(services.cost.descr).appendTo(td2);
         var td3=$("<td class='td_modi'></td>").appendTo(tr1);
-        $(" <input type='button' value='暂停' class='btn_pause'/>").appendTo(td3);
-        $("<input type='button' value='修改' class='btn_modify'/>").appendTo(td3);
-        $("<input type='button' value='删除' class='btn_delete'/>").appendTo(td3);
+        if (services.status==1){
+            $(" <input type='button' value='暂停' id='stopService' class='btn_pause'/>").attr("serviceId",services.serviceId).click(stopService).appendTo(td3);
+            $("<input type='button' value='修改' id='updateService' class='btn_modify'/>").attr("serviceId",services.serviceId).click(updateService).appendTo(td3);
+        }
+        if (services.status==2){
+            $("<input type='button' value='开通' id='startService' class='btn_modify'/>").attr("serviceId",services.serviceId).click(startService).appendTo(td3);
+            $("<input type='button' value='删除' id='deleteService' class='btn_delete'/>").attr("serviceId",services.serviceId).click(deleteService).appendTo(td3);
+        }
 
 
 $("#datalist").append(tr1);
 
     }
+
+    //暂停
+   var stopService=function () {
+
+   }
+
 
 
 //添加点击事件
@@ -164,7 +236,7 @@ $("#datalist").append(tr1);
                 }
             }
         })
-    })
+    });
 
 
 

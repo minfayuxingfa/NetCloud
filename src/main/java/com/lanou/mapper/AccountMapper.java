@@ -13,6 +13,7 @@ public interface AccountMapper {
     int insertSelective(Account account);
     void insertSelect(Account account);
     Account selectByPrimaryKey(Integer accountId);
+    Account selectByIdCard(Account account);
     List<Account> selectAllAccount();
     List<Account> selectBySituation(Account account);
 

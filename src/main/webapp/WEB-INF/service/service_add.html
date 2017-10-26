@@ -40,7 +40,7 @@
                 <div class="text_info clearfix"><span>身份证：</span></div>
                 <div class="input_info">
                     <input type="text" id="idCardAS" class="width180" />
-                    <input type="button" onclick="selectAccByIdCard()" class="btn_search_large" />
+                    <input type="button" onclick="selectAccByIdCard()" value="搜索账务账号"  class="btn_search_large" />
                     <span class="required">*</span>
                     <div class="validate_msg_short">没有此身份证号，请重新录入。</div>
                 </div>
@@ -52,34 +52,31 @@
                 </div>
                 <div class="text_info clearfix"><span>资费类型：</span></div>
                 <div class="input_info">
-                    <select>
-                        <option>包 20 小时</option>
-                        <option>包 40 小时</option>
-                        <option>包 60 小时</option>
-                        <option>包月</option>
+                    <select id="selectService">
+
                     </select>                        
                 </div> 
                 <div class="text_info clearfix"><span>服务器 IP：</span></div>
                 <div class="input_info">
-                    <input type="text" value="192.168.0.23"  />
+                    <input type="text" id="loginIpService"/>
                     <span class="required">*</span>
                     <div class="validate_msg_long">15 长度，符合IP的地址规范</div>
                 </div>                   
                 <div class="text_info clearfix"><span>登录 OS 账号：</span></div>
                 <div class="input_info">
-                    <input type="text" value="创建即启用，状态为开通"  />
+                    <input type="text" id="osUsername"  />
                     <span class="required">*</span>
                     <div class="validate_msg_long">8长度以内的字母、数字和下划线的组合</div>
                 </div>
                 <div class="text_info clearfix"><span>密码：</span></div>
                 <div class="input_info">
-                    <input type="password"  />
+                    <input type="password" id="password" />
                     <span class="required">*</span>
                     <div class="validate_msg_long">30长度以内的字母、数字和下划线的组合</div>
                 </div>
                 <div class="text_info clearfix"><span>重复密码：</span></div>
                 <div class="input_info">
-                    <input type="password"  />
+                    <input type="password"  id="rePassword"/>
                     <span class="required">*</span>
                     <div class="validate_msg_long">两次密码必须相同</div>
                 </div>     
@@ -112,23 +109,58 @@ $("#cancelAddService").click(function () {
 
 //添加保存点击事件
 $("#saveAddService").click(function () {
-    var idCardService= $("#idCardAS").val();
 
     $.ajax({
-        url:"/saveAddService",
+        url:"/getAccountIdService",
         type:"post",
-        data:{
-            idcardNo:idCardService
-        },
         success:function (result) {
-            $()
+         var   accoutIdService=result.data;
+            $.ajax({
+                url:"/saveAddService",
+                type:"post",
+                data:{
+                    accountId:accoutIdService,
+                    costId:$("option[class='option']:selected").attr("costId"),
+                    unixHost:$("#loginIpService").val(),
+                    osUsername:$("#osUsername").val(),
+                    loginPasswd:$("#password").val(),
+                    reLoginPasswd:$("#rePassword").val()
+                },
+                success:function (result) {
+                    if (result.data==1){
+                        window.location.href = "toService";
+                    }else {
+                        alert("两次输入密码不一致,请重新输入")
+                    }
+                }
+            })
+
         }
-    })
+    });
+
 })
+
+//资费类型
+function getAllAccountName() {
+    $.ajax({
+        url:"/getAllAccountName",
+        type:"post",
+        success:function (result) {
+            var costList=result.data;
+            var select=$("#selectService");
+            for (var i=0;i<costList.length;i++){
+                $("<option class='option'></option>").html(costList[i].name).appendTo(select).attr("costId",costList[i].costId);
+            }
+        }
+    });
+}
+getAllAccountName();
+
 
 //查询账务账号
   function selectAccByIdCard() {
       var idCardService= $("#idCardAS").val();
+      alert(idCardService)
       $.ajax({
           url:"/selectAccByIdCard",
           type:"post",
@@ -136,13 +168,17 @@ $("#saveAddService").click(function () {
               idcardNo:idCardService
           },
           success:function (result) {
-              $("#AccountService").val(result.data)
+              $("#AccountService").val(result.data.loginName)
+
           }
       })
   }
 
 
-        //保存成功的提示信息
+
+
+
+  //保存成功的提示信息
         function showResult() {
             showResultDiv(true);
             window.setTimeout("showResultDiv(false);", 3000);

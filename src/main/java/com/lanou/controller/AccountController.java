@@ -243,5 +243,20 @@ public class AccountController {
         return new AjaxResult(searchAccount);
 
     }
+    //    搜索账务账号
+    @ResponseBody
+    @RequestMapping(value = "/selectAccByIdCard",method = RequestMethod.POST)
+    public AjaxResult selectAccByIdCard(HttpServletRequest request,Account account){
+        Account account1 = accountService.selectByIdCard(account);
+        request.getSession().setAttribute("accountIdService",account1.getAccountId());
+        return new AjaxResult(account1);
+    }
+    //    得到session中的账务账号
+    @ResponseBody
+    @RequestMapping(value = "/getAccountIdService",method = RequestMethod.POST)
+    public AjaxResult getAccountIdService(HttpServletRequest request){
+        Integer accountIdService = (Integer) request.getSession().getAttribute("accountIdService");
+        return new AjaxResult(accountIdService);
+    }
 
 }

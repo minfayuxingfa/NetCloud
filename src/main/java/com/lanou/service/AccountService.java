@@ -16,6 +16,7 @@ List<Account> selectBySituation(Account account);
 void insertSelect(Account account);
 int deleteByPrimaryKey(Account account);
 Account selectByPrimaryKey(Account account);
+Account selectByIdCard(Account account);
 int updateByPrimaryKeySelected(Account account);
     PageInfo<Account> getPageinfo(Integer pageSize);
 }

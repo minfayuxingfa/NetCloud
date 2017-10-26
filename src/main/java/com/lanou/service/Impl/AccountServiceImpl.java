@@ -49,6 +49,11 @@ public class AccountServiceImpl implements AccountService {
         return account1;
     }
 
+    public Account selectByIdCard(Account account) {
+        Account account1 = accountMapper.selectByIdCard(account);
+        return account1;
+    }
+
     public int updateByPrimaryKeySelected(Account account) {
         int i = accountMapper.updateByPrimaryKeySelective(account);
 

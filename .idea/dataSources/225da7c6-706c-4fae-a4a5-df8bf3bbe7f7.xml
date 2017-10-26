@@ -287,6 +287,7 @@
       <DataType>int(10)|0</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;0&apos;</DefaultExpression>
+      <SequenceIdentity>1</SequenceIdentity>
     </column>
     <column id="90" parent="34" name="account_id">
       <Position>2</Position>
