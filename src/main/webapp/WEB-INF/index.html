@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <link type="text/css" rel="stylesheet" media="all" href="styles/global.css"/>
+    <link type="text/css" rel="stylesheet" media="all" href="styles/global_color.css"/>
+    <script src="/jquery-3.2.1.js"></script>
+
+</head>
+<body class="index">
+<!--导航区域开始-->
+<div id="index_navi">
+    <ul id="menu">
+        <li><a  class="index_on"></a></li>
+        <li><a  class="role_off" id="role_list"></a></li>
+        <li><a  class="admin_off" id="admin_list"></a></li>
+        <li><a  class="fee_off" id="fee_list"></a></li>
+        <li><a  class="account_off" id="account_list"></a></li>
+        <li><a  class="service_off" id="service_list"></a></li>
+        <li><a  class="bill_off" id="bill_list"></a></li>
+        <li><a  class="report_off" id="report_list"></a></li>
+        <li><a  class="information_off" id="user_info"></a></li>
+        <li><a  class="password_off" id="user_modi_pwd"></a></li>
+    </ul>
+</div>
+</body>
+<script>
+
+    <!--跳到资费管理-->
+    $("#fee_list").click(function () {
+
+        $.ajax({
+            url: "/feeList",
+            success:function (result) {
+                if (result.data==1){
+                    window.location.href="/toFee";
+                }
+            }
+        })
+    })
+//  跳到账务账号
+    $("#account_list").click(function () {
+        $.ajax({
+            url:"/accountList",
+            success:function (result) {
+                if (result.data==1){
+                    window.location.href="/toAccount";
+                }
+            }
+        })
+    })
+    //跳到业务账号
+    $("#service_list").click(function () {
+        $.ajax({
+            url:"/serviceList",
+            success:function (result) {
+                if (result.data==1){
+                    window.location.href="/toService";
+                }
+            }
+        })
+    })
+</script>
+</html>

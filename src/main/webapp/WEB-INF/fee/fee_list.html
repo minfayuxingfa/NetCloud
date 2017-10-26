@@ -1,0 +1,566 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title></title>
+        <link type="text/css" rel="stylesheet" media="all" href="../styles/global.css" />
+        <link type="text/css" rel="stylesheet" media="all" href="../styles/global_color.css" />
+       <script src="/jquery-3.2.1.js"></script>
+    </head>
+    <body>
+        <!--Logo区域开始-->
+        <div id="header">
+            <img src="../images/logo.png" alt="logo" class="left"/>
+            <a href="#">[退出]</a>            
+        </div>
+        <!--Logo区域结束-->
+        <!--导航区域开始-->
+        <div id="navi">                        
+            <ul id="menu">
+                <li><a href="../index.html" class="index_off"></a></li>
+                <li><a href="../role/role_list.html" class="role_off"></a></li>
+                <li><a href="../admin/admin_list.html" class="admin_off"></a></li>
+                <li><a href="../fee/fee_list.html" class="fee_on"></a></li>
+                <li><a href="../account/account_list.html" class="account_off"></a></li>
+                <li><a href="../service/service_list.html" class="service_off"></a></li>
+                <li><a href="../bill/bill_list.html" class="bill_off"></a></li>
+                <li><a href="../report/report_list.html" class="report_off"></a></li>
+                <li><a href="../user/user_info.html" class="information_off"></a></li>
+                <li><a href="../user/user_modi_pwd.html" class="password_off"></a></li>
+            </ul>            
+        </div>
+        <!--导航区域结束-->
+        <!--主要区域开始-->
+        <div id="main">
+
+                <!--排序-->
+                <div class="search_add">
+                    <div id="Order">
+                        <!--<input type="button" value="月租" class="sort_asc" onclick="sort(this);" />-->
+                        <input type="button" value="基费" id="costAsc" class="sort_asc" onclick="costOrder(this)" />
+                        <input type="button" value="时长" id="durationAsc" class="sort_asc" onclick="durationOrder(this)" />
+                    </div>
+                    <input type="button" value="增加" class="btn_add" onclick="addCost()" />
+                </div> 
+                <!--启用操作的操作提示-->
+                <div id="operate_result_info" class="operate_success">
+                    <img src="../images/close.png" onclick="this.parentNode.style.display='none';" />
+                    删除成功！
+                </div>    
+                <!--数据区域：用表格展示数据-->     
+                <div id="data">            
+                    <table id="datalist">
+                        <tr>
+                            <th>资费ID</th>
+                            <th class="width100">资费名称</th>
+                            <th>基本时长</th>
+                            <th>基本费用</th>
+                            <th>单位费用</th>
+                            <th>创建时间</th>
+                            <th>开通时间</th>
+                            <th class="width50">状态</th>
+                            <th class="width200"></th>
+                        </tr>
+                    </table>
+                    <p>业务说明：<br />
+                    1、创建资费时，状态为暂停，记载创建时间；<br />
+                    2、暂停状态下，可修改，可删除；<br />
+                    3、开通后，记载开通时间，且开通后不能修改、不能再停用、也不能删除；<br />
+                    4、业务账号修改资费时，在下月底统一触发，修改其关联的资费ID（此触发动作由程序处理）
+                    </p>
+                </div>
+                <!--添加分页-->
+
+            <div align="center" style="height: 30px">
+            <nav aria-label="Page navigation" id="nav" >
+                <ul class="pagination" id="ul" >
+
+                </ul>
+            </nav>
+        </div>
+        </div>
+        <!--主要区域结束-->
+        <div id="footer">
+            <p>[源自北美的技术，最优秀的师资，最真实的企业环境，最适用的实战项目]</p>
+            <p>版权所有(C)云科技有限公司</p>
+        </div>
+    </body>
+<style type="text/css">
+    .color{
+      color: red;
+    }
+    .colour{
+        color: #0a97ff;
+    }
+</style>
+    <script type="text/javascript">
+
+function costOrder(obj) {
+    $(".split").remove();
+    $(".text").remove();
+    sort(obj);
+    if (obj.className == "sort_asc"){
+        $.ajax({
+            url:"/orderAllCostAsc",
+            success:function (res) {
+                $.ajax({
+                    url:"/pageinfo",
+                    type:"post",
+                    data:{
+                        pagesize:4
+                    },
+                    success:function (result) {
+
+                        splitePageCostAsc(result.pages)
+
+                    }
+                });
+                var costList = res.data;
+                for (var i=0;i<4;i++){
+                    var msg = costList[i];
+                    addNewCost(msg)
+                }
+            }
+        })
+    }else {
+        $.ajax({
+            url:"/orderAllCostDesc",
+            success:function (res) {
+                $.ajax({
+                    url:"/pageinfo",
+                    type:"post",
+                    data:{
+                        pagesize:4
+                    },
+                    success:function (result) {
+
+                        splitePageCostDesc(result.pages)
+
+                    }
+                });
+                var costList = res.data;
+                for (var i=0;i<4;i++){
+                    var msg = costList[i];
+                    addNewCost(msg)
+                }
+            }
+        })
+    }
+
+
+}
+
+function durationOrder(obj) {
+    $(".split").remove();
+    $(".text").remove();
+    sort(obj);
+    if(obj.className=="sort_asc"){
+    $.ajax({
+        url:"/orderAllDurationAsc",
+        success:function (res) {
+            $.ajax({
+                url:"/pageinfo",
+                type:"post",
+                data:{
+                    pagesize:4
+                },
+                success:function (result) {
+                    splitePageDurationAsc(result.pages)
+
+                }
+            });
+            var costList = res.data;
+            for (var i=0;i<4;i++){
+                var msg = costList[i];
+                addNewCost(msg)
+            }
+        }
+    })
+}else {
+        $.ajax({
+            url:"/orderAllDurationDesc",
+            success:function (res) {
+                $.ajax({
+                    url:"/pageinfo",
+                    type:"post",
+                    data:{
+                        pagesize:4
+                    },
+                    success:function (result) {
+                        splitePageDurationDesc(result.pages)
+
+
+                    }
+                });
+                var costList = res.data;
+                for (var i=0;i<4;i++){
+                    var msg = costList[i];
+                    addNewCost(msg)
+                }
+            }
+        })
+    }
+}
+
+        //排序按钮的点击事件
+        function sort(btnObj) {
+            if (btnObj.className == "sort_desc")
+                btnObj.className = "sort_asc";
+            else
+                btnObj.className = "sort_desc";
+        }
+
+        //启用
+       var startFee = function () {
+            var r = window.confirm("确定要启用此资费吗？资费启用后将不能修改和删除。");
+           var cid = $(this).attr("startid");
+           $.ajax({
+               url: "/startFee",
+               data: {
+                   costId: cid
+               },
+               success: function (result) {
+                   var id = result.data;
+
+                   $("#start" + id).html("开启");
+
+
+               }
+           })
+       }
+
+
+//分页1
+        function splitePage(number) {
+            var str = $("<li class='split'></li>");
+            var str1 = $("<a href='#' aria-label='Previous'></a>").appendTo(str);
+            $("<span aria-hidden='true'>&laquo;</span>").appendTo(str1);
+
+
+            for (var num = 1; num <= number; num++) {
+                $("<a href='###' " +
+                    "class='num'></a>").html(num).appendTo(str).attr("num", num).click(page);
+            }
+
+            var str2 = $("<a href='#' aria-label='Next'></a>").appendTo(str);
+            $("<span aria-hidden='true'>&raquo;</span>").appendTo(str2);
+
+            $("#ul").append(str)
+
+        }
+
+        var page= function() {
+            $("a").removeAttr("class");
+              $(this).attr("class","color");
+            var number = $(this).attr("num");
+
+            $(".text").remove()
+            $.ajax({
+                url: "/selectAllCost",
+                success: function (res) {
+                    var CostList = res.data;
+                    for (var i = 4 * (number - 1); i < 4 * number; i++) {
+                        var msg = CostList[i];
+                        addNewCost(msg)
+                    }
+                }
+            })
+
+        }
+
+        //分页2
+        function splitePageCostAsc(number) {
+            var str = $("<li class='split'></li>");
+            var str1 = $("<a href='#' aria-label='Previous'></a>").appendTo(str);
+            $("<span aria-hidden='true'>&laquo;</span>").appendTo(str1);
+
+
+            for (var num = 1; num <= number; num++) {
+                $("<a href='###' class='num'></a>").html(num).appendTo(str).attr("num", num).click(page1);
+            }
+
+            var str2 = $("<a href='#' aria-label='Next'></a>").appendTo(str);
+            $("<span aria-hidden='true'>&raquo;</span>").appendTo(str2);
+
+            $("#ul").append(str)
+
+        }
+
+        var page1= function() {
+            $("a").removeAttr("class");
+              $(this).attr("class","color");
+            var number = $(this).attr("num");
+
+            $(".text").remove()
+            $.ajax({
+                url: "/orderAllCostAsc",
+                success: function (res) {
+                    var CostList = res.data;
+                    for (var i = 4 * (number - 1); i < 4 * number; i++) {
+                        var msg = CostList[i];
+                        addNewCost(msg)
+                    }
+                }
+            })
+
+        }
+
+        //分页3
+        function splitePageDurationAsc(number) {
+            var str = $("<li class='split'></li>");
+            var str1 = $("<a href='#' aria-label='Previous'></a>").appendTo(str);
+            $("<span aria-hidden='true'>&laquo;</span>").appendTo(str1);
+
+
+            for (var num = 1; num <= number; num++) {
+                $("<a href='###' class='num'></a>").html(num).appendTo(str).attr("num", num).click(page2);
+            }
+
+            var str2 = $("<a href='#' aria-label='Next'></a>").appendTo(str);
+            $("<span aria-hidden='true'>&raquo;</span>").appendTo(str2);
+
+            $("#ul").append(str)
+
+        }
+
+        var page2= function() {
+            $("a").removeAttr("class");
+              $(this).attr("class","color");
+            var number = $(this).attr("num");
+
+            $(".text").remove()
+            $.ajax({
+                url: "/orderAllDurationAsc",
+                success: function (res) {
+                    var CostList = res.data;
+                    for (var i = 4 * (number - 1); i < 4 * number; i++) {
+                        var msg = CostList[i];
+                        addNewCost(msg)
+                    }
+                }
+            })
+
+        }
+
+        //分页4
+        function splitePageCostDesc(number) {
+            var str = $("<li class='split'></li>");
+            var str1 = $("<a href='#' aria-label='Previous'></a>").appendTo(str);
+            $("<span aria-hidden='true'>&laquo;</span>").appendTo(str1);
+
+
+            for (var num = 1; num <= number; num++) {
+                $("<a href='###' class='num'></a>").html(num).appendTo(str).attr("num", num).click(page3);
+            }
+
+            var str2 = $("<a href='#' aria-label='Next'></a>").appendTo(str);
+            $("<span aria-hidden='true'>&raquo;</span>").appendTo(str2);
+
+            $("#ul").append(str)
+
+        }
+
+        var page3= function() {
+            $("a").removeAttr("class");
+              $(this).attr("class","color");
+            var number = $(this).attr("num");
+
+            $(".text").remove()
+            $.ajax({
+                url: "/orderAllCostDesc",
+                success: function (res) {
+                    var CostList = res.data;
+                    for (var i = 4 * (number - 1); i < 4 * number; i++) {
+                        var msg = CostList[i];
+                        addNewCost(msg)
+                    }
+                }
+            })
+
+        }
+
+//分页5
+        function splitePageDurationDesc(number) {
+            var str = $("<li class='split'></li>");
+            var str1 = $("<a href='#' aria-label='Previous'></a>").appendTo(str);
+            $("<span aria-hidden='true'>&laquo;</span>").appendTo(str1);
+
+
+            for (var num = 1; num <= number; num++) {
+                $("<a href='###' class='num'></a>").html(num).appendTo(str).attr("num", num).click(page4);
+            }
+
+            var str2 = $("<a href='#' aria-label='Next'></a>").appendTo(str);
+            $("<span aria-hidden='true'>&raquo;</span>").appendTo(str2);
+
+            $("#ul").append(str)
+
+        }
+
+        var page4= function() {
+            $("a").removeAttr("class");
+              $(this).attr("class","color");
+            var number = $(this).attr("num");
+
+            $(".text").remove()
+            $.ajax({
+                url: "/orderAllDurationDesc",
+                success: function (res) {
+                    var CostList = res.data;
+                    for (var i = 4 * (number - 1); i < 4 * number; i++) {
+                        var msg = CostList[i];
+                        addNewCost(msg)
+                    }
+                }
+            })
+
+        }
+
+
+       var modi = function () {
+           var r = window.confirm("确定要修改吗？修改后将不能恢复。");
+           var cid = $(this).attr("modiid");
+           $.ajax({
+               url: "/modiCost",
+               data: {
+                   costId: cid
+               },
+               success: function (result) {
+                  if(result.data==1){
+                   window.location.href="/toModi";
+                  }
+
+
+
+               }
+           })
+        }
+
+        var  detail=function () {
+            var name = $(this).html();
+            $.ajax({
+                   url:"/detail",
+                   type:"post",
+                   data:{
+                     name:name
+                   },
+                   success:function (result) {
+                       if (result.data==1){
+                           window.location.href="/toDetail"
+                       }
+                   }
+               })
+        }
+        function addNewCost(msg) {
+
+            var str = $("<tr class='text'></tr>").attr("id", "cid" + msg.costId);
+            var td1 = $("<td></td>").appendTo(str);
+            var td2 = $("<td></td>").appendTo(str);
+            var td3 = $("<td></td>").appendTo(str);
+            var td4 = $("<td></td>").appendTo(str);
+            var td5 = $("<td></td>").appendTo(str);
+            var td6 = $("<td></td>").appendTo(str);
+            var td7 = $("<td></td>").appendTo(str);
+            var td8 = $("<td></td>").appendTo(str);
+            var td9 = $("<td></td>").appendTo(str);
+
+
+            $("<div></div>").html(msg.costId).appendTo(td1);
+            $("<div></div>").html(msg.name).click(detail).appendTo(td2);
+            $("<div></div>").html(msg.baseDuration).appendTo(td3);
+            $("<div></div>").html(msg.baseCost).appendTo(td4);
+            $("<div></div>").html(msg.unitCost).appendTo(td5);
+            $("<div></div>").html(msg.creatime).appendTo(td6);
+            $("<div></div>").html(msg.startime).appendTo(td7);
+            if (msg.status==1){
+            $("<div></div>").html("开启").appendTo(td8).attr("id","start"+msg.costId);
+        }else {
+                $("<div></div>").html("关闭").appendTo(td8).attr("id","start"+msg.costId);
+            }
+
+            var div=$("<div></div>").appendTo(td9);
+
+             $("<input type='button' value='启用' class='btn_start'/>").appendTo(div).click(startFee).attr("startid",msg.costId);
+             $(" <input type='button' value='修改' class='btn_modify'/>").appendTo(div).click(modi).attr("modiid",msg.costId);
+            $("<input type='button' value='删除' class='btn_delete' />").appendTo(div).attr("delid",+msg.costId).click(del) ;
+
+            $("#datalist").append(str);
+        }
+        ;
+
+
+        var del = function () {
+            var r = window.confirm("确定要删除此资费吗？");
+            var cid = $(this).attr("delid");
+            $.ajax({
+                url: "/delCost",
+                data: {
+                    costId: cid
+                },
+                success: function (result) {
+                    var id = result.data;
+
+                    $("#cid" + id).html(null);
+
+//                $(".text").remove();
+//                $(".pages").remove();
+//                getAllBlogs()
+
+                }
+            })
+
+        }
+
+        function addCost() {
+            $.ajax({
+                url:"/addCost",
+                success:function (result) {
+                    if (result.data==1){
+                        window.location.href="/toAdd";
+                    }
+                }
+            })
+        }
+
+
+
+
+        function selectAllCost() {
+            //利用ajax请求全部信息
+            //1.后端使用假数据
+            //2.前端使用ajax请求
+            //3.把AjaxResult类利用起来
+            //4.一直写到使用addNewTr为止
+
+            $.ajax({
+                url: "/selectAllCost",
+                success: function (res) {
+                    $.ajax({
+                       url:"/pageinfo",
+                        type:"post",
+                        data:{
+                           pagesize:4
+                        },
+                        success:function (result) {
+                            splitePage(result.pages)
+
+                        }
+                    });
+                    var costList = res.data;
+                   for (var i=0;i<4;i++){
+                    var msg = costList[i];
+                       addNewCost(msg)
+                   }
+
+                }
+            })
+
+        }
+
+
+
+
+        selectAllCost();
+    </script>
+
+</html>
