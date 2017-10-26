@@ -12,9 +12,11 @@ import java.util.List;
 public interface ServiceService {
 
     List<Service>selectAllService();
+    List<Service>selectServiceSelected(Service service);
 
     int insertSelective(Service service);
     PageInfo<Service> getPageinfo(Integer pageSize);
 
     Service selectServiceByPrimaryKey(Service service);
+    int updateByPrimaryKeySelective(Service service);
 }

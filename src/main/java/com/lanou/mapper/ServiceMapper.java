@@ -18,4 +18,5 @@ public interface ServiceMapper {
     int updateByPrimaryKey(Service record);
 
     List<Service>selectAllService();
+    List<Service>selectServiceSelected(Service service);
 }

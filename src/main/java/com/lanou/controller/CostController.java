@@ -201,4 +201,12 @@ public class CostController {
         List<Cost> costs = costService.selectAllCost();
         return new AjaxResult(costs);
     }
+
+//    Service中修改
+    @ResponseBody
+    @RequestMapping(value = "/selecetCostIdByCostName",method = RequestMethod.POST)
+    public AjaxResult selecetCostIdByCostName(Cost cost){
+        Cost cost1 = costService.selectByName(cost);
+        return new AjaxResult(cost1);
+    }
 }

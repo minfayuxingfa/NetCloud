@@ -259,4 +259,12 @@ public class AccountController {
         return new AjaxResult(accountIdService);
     }
 
+    //    通过身份证找到accountId
+    @ResponseBody
+    @RequestMapping(value = "/findAccountIdByIdCard",method = RequestMethod.POST)
+    public AjaxResult findAccountIdByIdCard(Account account){
+        Account account1 = accountService.selectByIdCard(account);
+        return new AjaxResult(account1);
+    }
+
 }

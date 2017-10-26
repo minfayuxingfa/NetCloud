@@ -24,6 +24,11 @@ public class ServiceServiceImpl implements ServiceService {
         return services;
     }
 
+    public List<Service> selectServiceSelected(Service service) {
+        List<Service> services = serviceMapper.selectServiceSelected(service);
+        return services;
+    }
+
     public int insertSelective(Service service) {
         int i = serviceMapper.insertSelective(service);
         return i;
@@ -36,6 +41,11 @@ public class ServiceServiceImpl implements ServiceService {
     public Service selectServiceByPrimaryKey(Service service) {
         Service service1 = serviceMapper.selectByPrimaryKey(service.getServiceId());
         return service1;
+    }
+
+    public int updateByPrimaryKeySelective(Service service) {
+        int i = serviceMapper.updateByPrimaryKeySelective(service);
+        return i;
     }
 
     public PageInfo<Service>queryStudentByPage(Integer pageNo, Integer pageSize){

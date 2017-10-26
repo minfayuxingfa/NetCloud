@@ -42,6 +42,11 @@ public class ServiceController {
         return "/service/service_detail";
     }
 
+    @RequestMapping(value = "/toModiService")
+    public String toModi() {
+        return "/service/service_modi";
+    }
+
     //查询所有的Service
     @ResponseBody
     @RequestMapping(value = "/selectAllService", method = RequestMethod.POST)
@@ -105,6 +110,75 @@ public class ServiceController {
         Service serviceDetail = (Service) request.getSession().getAttribute("serviceDetail");
 
         return new AjaxResult(serviceDetail);
+    }
+
+    //   暂停service
+    @ResponseBody
+    @RequestMapping(value = "/stopService", method = RequestMethod.POST)
+    public AjaxResult stopService(Service service) {
+        service.setPauseDate(new Date());
+        service.setStatus("2");
+        int i = serviceService.updateByPrimaryKeySelective(service);
+        return new AjaxResult(1);
+    }
+
+    //   开通service
+    @ResponseBody
+    @RequestMapping(value = "/startService", method = RequestMethod.POST)
+    public AjaxResult startService(Service service) {
+        service.setPauseDate(null);
+        service.setStatus("1");
+        int i = serviceService.updateByPrimaryKeySelective(service);
+        return new AjaxResult(1);
+    }
+    //   修改service
+    @ResponseBody
+    @RequestMapping(value = "/updateService", method = RequestMethod.POST)
+    public AjaxResult updateService(HttpServletRequest request,Service service) {
+        Service service1 = serviceService.selectServiceByPrimaryKey(service);
+         request.getSession().setAttribute("updateService",service1);
+        return new AjaxResult(1);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/selectServiceModi", method = RequestMethod.POST)
+    public AjaxResult selectServiceModi(HttpServletRequest request) {
+
+        Service updateService = (Service) request.getSession().getAttribute("updateService");
+        return new AjaxResult(updateService);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/saveUpdateService", method = RequestMethod.POST)
+    public AjaxResult saveUpdateService(Service service) {
+
+
+        return new AjaxResult(1);
+    }
+
+
+
+    //  删除service
+    @ResponseBody
+    @RequestMapping(value = "/deleteService", method = RequestMethod.POST)
+    public AjaxResult deleteService(Service service) {
+        service.setCloseDate(new Date());
+        service.setStatus("3");
+        int i = serviceService.updateByPrimaryKeySelective(service);
+        return new AjaxResult(1);
+    }
+
+    // 多条件查询
+    @ResponseBody
+    @RequestMapping(value = "/multiSituationSelect", method = RequestMethod.POST)
+    public AjaxResult multiSituationSelect(Service service) {
+
+        System.out.println(service.getAccountId());
+        System.out.println(service.getStatus());
+        System.out.println(service.getOsUsername());
+        System.out.println(service.getUnixHost());
+        List<Service> services = serviceService.selectServiceSelected(service);
+        return new AjaxResult(services);
     }
 
 }

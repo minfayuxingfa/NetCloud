@@ -163,4 +163,28 @@
     <include refid="Base_Column_List" />
     from service
   </select>
+
+  <select id="selectServiceSelected" parameterType="com.lanou.bean.Service" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from service
+    WHERE
+    <trim suffixOverrides="AND">
+
+      <if test="accountId != null">
+       account_id =#{accountId,jdbcType=INTEGER} AND
+      </if>
+      <if test="unixHost != null">
+       unix_host= #{unixHost,jdbcType=VARCHAR} AND
+      </if>
+      <if test="osUsername != null">
+        os_username=#{osUsername,jdbcType=VARCHAR} AND
+      </if>
+
+      <if test="status != null">
+        status=#{status,jdbcType=CHAR} AND
+      </if>
+
+    </trim>
+  </select>
 </mapper>

@@ -36,18 +36,18 @@
 <div id="main">
         <!--查询-->
         <div class="search_add">
-            <div>OS 账号：<input type="text" value="" class="width100 text_search"/></div>
-            <div>服务器 IP：<input type="text" value="" class="width100 text_search"/></div>
-            <div>身份证：<input type="text" value="" class="text_search"/></div>
+            <div>OS 账号：<input type="text" id="multiOsName" class="width100 text_search"/></div>
+            <div>服务器 IP：<input type="text" id="multiUnixHost" class="width100 text_search"/></div>
+            <div>身份证：<input type="text" id="multiIdCard" class="text_search"/></div>
             <div>状态：
                 <select class="select_search">
-                    <option>全部</option>
-                    <option>开通</option>
-                    <option>暂停</option>
-                    <option>删除</option>
+                    <option >全部</option>
+                    <option class="option">开通</option>
+                    <option class="option">暂停</option>
+                    <option class="option">删除</option>
                 </select>
             </div>
-            <div><input type="button" value="搜索" class="btn_search"/></div>
+            <div><input type="button" value="搜索" onclick="multiSituationSelect()" class="btn_search"/></div>
             <input type="button" value="增加" class="btn_add" id="addService"/>
         </div>
         <!--删除的操作提示-->
@@ -97,6 +97,51 @@
     }
 </style>
 <script language="javascript" type="text/javascript">
+
+    //高级查询
+    function multiSituationSelect() {
+        var status;
+        if($("option[class='option']:selected").val()=="开通") {
+           status="1"
+        }
+        if($("option[class='option']:selected").val()=="暂停") {
+           status="2"
+        }
+        if($("option[class='option']:selected").val()=="删除") {
+           status="3"
+        }
+        $.ajax({
+            url:"/findAccountIdByIdCard",
+            type:"post",
+            data:{
+                idcardNo:$("#multiIdCard").val()
+            },
+            success:function (result) {
+              var  accountId=result.data.accountId;
+                $.ajax({
+                    url:"/multiSituationSelect",
+                    type:"post",
+                    data:{
+                        osUsername:$("#multiOsName").val(),
+                        unixHost:$("#multiUnixHost").val(),
+                        accountId:accountId,
+                        status:status
+                    },
+                    success:function (result) {
+                        $(".text").remove();
+                        $(".split").remove();
+                        var services=result.data;
+                        for (var i=0;i<services.length;i++){
+                            addNewService(services[i]);
+                        }
+                    }
+                })
+            }
+        });
+
+    }
+
+
    //显示详细的Account
     var serviceDetail=function () {
          $.ajax({
@@ -197,7 +242,7 @@
         $("<td></td>").html(services.account.realName).appendTo(tr1);
         $("<td></td>").html(services.osUsername).appendTo(tr1);
         $("<td></td>").html(status).appendTo(tr1);
-        $("<td></td>").html(services.account.lastLoginIp).appendTo(tr1);
+        $("<td></td>").html(services.unixHost).appendTo(tr1);
 //        $("<td></td>").html(services.cost.name).appendTo(tr1);
         var td2=$("<td></td>").appendTo(tr1);
 $("<a class='summary' onmouseover='showDetail(true,this);' onmouseout='showDetail(false,this);'> </a>")
@@ -220,7 +265,73 @@ $("#datalist").append(tr1);
 
     //暂停
    var stopService=function () {
+       $.ajax({
+           url:"/stopService",
+           type:"post",
+           data:{
+               serviceId:$(this).attr("serviceId")
+           },
+           success:function (result) {
+               if (result.data==1){
+                   $(".text").remove();
+                   $(".split").remove();
+                   selectAllService();
+                   }
 
+           }
+       })
+   }
+   //开通
+   var startService=function () {
+       $.ajax({
+           url:"/startService",
+           type:"post",
+           data:{
+               serviceId:$(this).attr("serviceId")
+           },
+           success:function (result) {
+               if (result.data==1){
+                   $(".text").remove();
+                   $(".split").remove();
+                   selectAllService();
+               }
+
+         }
+
+       })
+   }
+   //修改
+   var updateService=function () {
+       $.ajax({
+           url:"/updateService",
+           type:"post",
+           data:{
+               serviceId:$(this).attr("serviceId")
+           },
+           success:function (result) {
+             if (result.data==1){
+                 window.location.href="/toModiService";
+             }
+           }
+       })
+   }
+   //删除
+   var deleteService=function () {
+       $.ajax({
+           url:"/deleteService",
+           type:"post",
+           data:{
+               serviceId:$(this).attr("serviceId")
+           },
+           success:function (result) {
+               if (result.data==1){
+                   $(".text").remove();
+                   $(".split").remove();
+                   selectAllService();
+               }
+
+           }
+       })
    }
 
 
