@@ -41,4 +41,16 @@ public class ServiceController {
 
         return new AjaxResult(services);
     }
+
+//    去添加页面
+    @ResponseBody
+    @RequestMapping(value = "/addService",method = RequestMethod.POST)
+    public AjaxResult addServiece(){
+        return new AjaxResult(1);
+    }
+
+    @RequestMapping(value = "/toAddService")
+    public String toAddService(){
+        return "/service/service_add";
+    }
 }

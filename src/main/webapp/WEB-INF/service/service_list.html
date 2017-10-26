@@ -49,7 +49,7 @@
                 </select>
             </div>
             <div><input type="button" value="搜索" class="btn_search"/></div>
-            <input type="button" value="增加" class="btn_add" onclick="location.href='service_add.html';"/>
+            <input type="button" value="增加" class="btn_add" id="addService"/>
         </div>
         <!--删除的操作提示-->
         <div id="operate_result_info" class="operate_success">
@@ -151,6 +151,21 @@ $("<a class='summary' onmouseover='showDetail(true,this);' onmouseout='showDetai
 $("#datalist").append(tr1);
 
     }
+
+
+//添加点击事件
+    $("#addService").click(function () {
+        $.ajax({
+            url:"/addService",
+            type:"post",
+            success:function (result) {
+                if (result.data==1){
+                    window.location.href="/toAddService";
+                }
+            }
+        })
+    })
+
 
 
 
