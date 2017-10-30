@@ -5,20 +5,7 @@
         <title>云科技</title>
         <link type="text/css" rel="stylesheet" media="all" href="../styles/global.css" />
         <link type="text/css" rel="stylesheet" media="all" href="../styles/global_color.css" />
-        <script language="javascript" type="text/javascript">
-            //保存成功的提示消息
-            function showResult() {
-                showResultDiv(true);
-                window.setTimeout("showResultDiv(false);", 3000);
-            }
-            function showResultDiv(flag) {
-                var divResult = document.getElementById("save_result_info");
-                if (flag)
-                    divResult.style.display = "block";
-                else
-                    divResult.style.display = "none";
-            }
-        </script>
+        <script src="/jquery-3.2.1.js"></script>
     </head>
     <body>
         <!--Logo区域开始-->
@@ -49,59 +36,51 @@
             <form action="" method="" class="main_form">
                     <div class="text_info clearfix"><span>姓名：</span></div>
                     <div class="input_info">
-                        <input type="text" />
+                        <input type="text" id="name"/>
                         <span class="required">*</span>
                         <div class="validate_msg_long">20长度以内的汉字、字母、数字的组合</div>
                     </div>
                     <div class="text_info clearfix"><span>管理员账号：</span></div>
                     <div class="input_info">
-                        <input type="text"  />
+                        <input type="text" id="adminCode" />
                         <span class="required">*</span>
                         <div class="validate_msg_long">30长度以内的字母、数字和下划线的组合</div>
                     </div>
                     <div class="text_info clearfix"><span>密码：</span></div>
                     <div class="input_info">
-                        <input type="password"  />
+                        <input type="password"  id="password"/>
                         <span class="required">*</span>
                         <div class="validate_msg_long error_msg">30长度以内的字母、数字和下划线的组合</div>
                     </div>
                     <div class="text_info clearfix"><span>重复密码：</span></div>
                     <div class="input_info">
-                        <input type="password"  />
+                        <input type="password"  id="rePassword"/>
                         <span class="required">*</span>
                         <div class="validate_msg_long error_msg">两次密码必须相同</div>
                     </div>      
                     <div class="text_info clearfix"><span>电话：</span></div>
                     <div class="input_info">
-                        <input type="text" class="width200"/>
+                        <input type="text" class="width200" id="telephone"/>
                         <span class="required">*</span>
                         <div class="validate_msg_medium error_msg">正确的电话号码格式：手机或固话</div>
                     </div>
                     <div class="text_info clearfix"><span>Email：</span></div>
                     <div class="input_info">
-                        <input type="text" class="width200"/>
+                        <input type="text" class="width200" id="email"/>
                         <span class="required">*</span>
                         <div class="validate_msg_medium error_msg">50长度以内，正确的 email 格式</div>
                     </div>
                     <div class="text_info clearfix"><span>角色：</span></div>
                     <div class="input_info_high">
-                        <div class="input_info_scroll">
-                            <ul>
-                                <li><input type="checkbox"  />超级管理员</li>
-                                <li><input type="checkbox" />账务账号管理员</li>
-                                <li><input type="checkbox" />业务账号管理员</li>
-                                <li><input type="checkbox" />账务账号管理员</li>
-                                <li><input type="checkbox" />业务账号管理员</li>
-                                <li><input type="checkbox" />账务账号管理员</li>
-                                <li><input type="checkbox" />业务账号管理员</li>
-                            </ul>
+                        <div class="input_info_scroll" id="role">
+
                         </div>
                         <span class="required">*</span>
                         <div class="validate_msg_tiny error_msg">至少选择一个</div>
                     </div>
                     <div class="button_info clearfix">
-                        <input type="button" value="保存" class="btn_save" onclick="showResult();" />
-                        <input type="button" value="取消" class="btn_save" />
+                        <input type="button" value="保存" class="btn_save" onclick="saveAddAdmin()" />
+                        <input type="button" value="取消" class="btn_save" onclick="returnToAdminList()"/>
                     </div>
                 </form>  
         </div>
@@ -112,4 +91,101 @@
             <span>版权所有(C)云科技有限公司 </span>
         </div>
     </body>
+    <script language="javascript" type="text/javascript">
+
+
+
+//显示所有的角色
+ function showRoles() {
+     $.ajax({
+         url:"/selectAllRoleInfo",
+         type:"post",
+         success:function (result) {
+             var RoleInfos=result.data;
+             var ul =$("<ul></ul>");
+             for (var i=0;i<RoleInfos.length;i++){
+                 var li =$("<li></li>").appendTo(ul);
+                 $("<input class='checking' type='checkbox'/>").attr("roleId",RoleInfos[i].roleId).appendTo(li);
+                 $("<a></a>").html(RoleInfos[i].name).appendTo(li);
+             }
+             $("#role").append(ul);
+         }
+     })
+ }
+
+
+//保存点击事件
+    function saveAddAdmin() {
+    $.ajax({
+        url:"/saveAddAdmin",
+        type:"post",
+        data:{
+            name:$("#name").val(),
+            adminCode:$("#adminCode").val(),
+            password:$("#password").val(),
+            rePassword:$("#rePassword").val(),
+            telephone:$("#telephone").val(),
+            email:$("#email").val()
+        },
+        success:function (result) {
+if (result.data==1){
+    var roleIdList=[];
+
+    $("input:checked").each(function () {
+        roleIdList.push($(this).attr("roleId"))
+    })
+    $.ajax({
+        url:"/saveAddAdminSe",
+        traditional:true,
+        data:{
+            roleIdList:roleIdList
+        },
+        success:function (result) {
+            if (result.data == 1){
+                alert("添加成功");
+                $(".text").remove();
+                $(".split").remove();
+                window.location.href="/toAdmin";
+            }
+        }
+    })
+}else {
+    alert("两次输入密码不一致,请重新输入")
+
+}
+
+
+
+        }
+    })
+    }
+
+//    返回点击事件
+function returnToAdminList() {
+    $.ajax({
+        url:"/adminList",
+        success:function (result) {
+
+            if (result.data==1){
+                window.location.href="/toAdmin";
+            }
+        }
+    })
+}
+
+
+        //保存成功的提示消息
+        function showResult() {
+            showResultDiv(true);
+            window.setTimeout("showResultDiv(false);", 3000);
+        }
+        function showResultDiv(flag) {
+            var divResult = document.getElementById("save_result_info");
+            if (flag)
+                divResult.style.display = "block";
+            else
+                divResult.style.display = "none";
+        }
+        showRoles()
+    </script>
 </html>

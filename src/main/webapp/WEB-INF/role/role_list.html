@@ -1,115 +1,234 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <title></title>
-        <link type="text/css" rel="stylesheet" media="all" href="../styles/global.css" />
-        <link type="text/css" rel="stylesheet" media="all" href="../styles/global_color.css" /> 
-        <script language="javascript" type="text/javascript">
-            function deleteRole() {
-                var r = window.confirm("确定要删除此角色吗？");
-                document.getElementById("operate_result_info").style.display = "block";
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <link type="text/css" rel="stylesheet" media="all" href="../styles/global.css"/>
+    <link type="text/css" rel="stylesheet" media="all" href="../styles/global_color.css"/>
+    <script src="/jquery-3.2.1.js"></script>
+</head>
+<body>
+<!--Logo区域开始-->
+<div id="header">
+    <img src="../images/logo.png" alt="logo" class="left"/>
+    <a href="#">[退出]</a>
+</div>
+<!--Logo区域结束-->
+<!--导航区域开始-->
+<div id="navi">
+    <ul id="menu">
+        <li><a href="../index.html" class="index_off"></a></li>
+        <li><a href="../role/role_list.html" class="role_on"></a></li>
+        <li><a href="../admin/admin_list.html" class="admin_off"></a></li>
+        <li><a href="../fee/fee_list.html" class="fee_off"></a></li>
+        <li><a href="../account/account_list.html" class="account_off"></a></li>
+        <li><a href="../service/service_list.html" class="service_off"></a></li>
+        <li><a href="../bill/bill_list.html" class="bill_off"></a></li>
+        <li><a href="../report/report_list.html" class="report_off"></a></li>
+        <li><a href="../user/user_info.html" class="information_off"></a></li>
+        <li><a href="../user/user_modi_pwd.html" class="password_off"></a></li>
+    </ul>
+</div>
+<!--导航区域结束-->
+<!--主要区域开始-->
+<div id="main">
+
+        <!--查询-->
+        <div class="search_add">
+            <input type="button" value="增加" class="btn_add" onclick="addRole()"/>
+        </div>
+        <!--删除的操作提示-->
+        <div id="operate_result_info" class="operate_success">
+            <img src="../images/close.png" onclick="this.parentNode.style.display='none';"/>
+            删除成功！
+        </div> <!--删除错误！该角色被使用，不能删除。-->
+        <!--数据区域：用表格展示数据-->
+        <div id="data">
+            <table id="datalist">
+                <tr>
+                    <th>角色 ID</th>
+                    <th>角色名称</th>
+                    <th class="width600">拥有的权限</th>
+                    <th class="td_modi"></th>
+                </tr>
+
+            </table>
+        </div>
+        <!--分页-->
+        <div id="pages">
+            <!--<a href="#">上一页</a>-->
+            <!--<a href="#" class="current_page">1</a>-->
+            <!--<a href="#">2</a>-->
+            <!--<a href="#">3</a>-->
+            <!--<a href="#">4</a>-->
+            <!--<a href="#">5</a>-->
+            <!--<a href="#">下一页</a>-->
+        </div>
+
+</div>
+<!--主要区域结束-->
+<div id="footer">
+    <p>[源自北美的技术，最优秀的师资，最真实的企业环境，最适用的实战项目]</p>
+    <p>版权所有(C)云科技有限公司 </p>
+</div>
+</body>
+<style type="text/css">
+    .color{
+        background-color: red;
+    }
+    .colour{
+        color: #0a97ff;
+    }
+</style>
+<script language="javascript" type="text/javascript">
+
+    //增加点击事件
+     function addRole() {
+         $.ajax({
+             url:"/addRole",
+             type:"post",
+             success:function (result) {
+                 if (result.data==1) {
+                     window.location.href = "/toAddRole";
+                 }
+                 }
+         })
+     }
+
+    //显示所有角色
+    function selectAllRoleInfo() {
+        $.ajax({
+            url: "/selectAllRoleInfo",
+            type: "post",
+            success: function (result) {
+
+                $.ajax({
+                    url:"/rolePage",
+                    type:"post",
+                    data:{
+                        pagesize:4
+                    },
+                    success:function (result) {
+                        splitePage(result.pages)
+                    }
+                });
+
+
+                var roleInfos = result.data;
+                 for (var i=0;i<4;i++){
+                          addNewRoleInfo(roleInfos[i]);
+                 }
             }
-        </script>
-    </head>
-    <body>
-        <!--Logo区域开始-->
-        <div id="header">
-            <img src="../images/logo.png" alt="logo" class="left"/>
-            <a href="#">[退出]</a>            
-        </div>
-        <!--Logo区域结束-->
-        <!--导航区域开始-->
-        <div id="navi">                        
-            <ul id="menu">
-                <li><a href="../index.html" class="index_off"></a></li>
-                <li><a href="../role/role_list.html" class="role_on"></a></li>
-                <li><a href="../admin/admin_list.html" class="admin_off"></a></li>
-                <li><a href="../fee/fee_list.html" class="fee_off"></a></li>
-                <li><a href="../account/account_list.html" class="account_off"></a></li>
-                <li><a href="../service/service_list.html" class="service_off"></a></li>
-                <li><a href="../bill/bill_list.html" class="bill_off"></a></li>
-                <li><a href="../report/report_list.html" class="report_off"></a></li>
-                <li><a href="../user/user_info.html" class="information_off"></a></li>
-                <li><a href="../user/user_modi_pwd.html" class="password_off"></a></li>
-            </ul>            
-        </div>
-        <!--导航区域结束-->
-        <!--主要区域开始-->
-        <div id="main">
-            <form action="" method="">
-                <!--查询-->
-                <div class="search_add">
-                    <input type="button" value="增加" class="btn_add" onclick="location.href='role_add.html';" />
-                </div>  
-                <!--删除的操作提示-->
-                <div id="operate_result_info" class="operate_success">
-                    <img src="../images/close.png" onclick="this.parentNode.style.display='none';" />
-                    删除成功！
-                </div> <!--删除错误！该角色被使用，不能删除。-->
-                <!--数据区域：用表格展示数据-->     
-                <div id="data">                      
-                    <table id="datalist">
-                        <tr>                            
-                            <th>角色 ID</th>
-                            <th>角色名称</th>
-                            <th class="width600">拥有的权限</th>
-                            <th class="td_modi"></th>
-                        </tr>                      
-                        <tr>
-                            <td>1</td>
-                            <td>贾强</td>
-                            <td>角色管理、管理员管理、资费管理、账务账号、业务账号、账单、报表</td>
-                            <td>
-                                <input type="button" value="修改" class="btn_modify" onclick="location.href='role_modi.html';"/>
-                                <input type="button" value="删除" class="btn_delete" onclick="deleteRole();" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>贾强</td>
-                            <td>超级管理员、账单管理员</td>
-                            <td>
-                                <input type="button" value="修改" class="btn_modify" />
-                                <input type="button" value="删除" class="btn_delete" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>贾强</td>
-                            <td>超级管理员、账单管理员</td>
-                            <td>
-                                <input type="button" value="修改" class="btn_modify" />
-                                <input type="button" value="删除" class="btn_delete" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>贾强</td>
-                            <td>超级管理员、账单管理员</td>
-                            <td>
-                                <input type="button" value="修改" class="btn_modify" />
-                                <input type="button" value="删除" class="btn_delete" />
-                            </td>
-                        </tr>
-                    </table>
-                </div> 
-                <!--分页-->
-                <div id="pages">
-        	        <a href="#">上一页</a>
-                    <a href="#" class="current_page">1</a>
-                    <a href="#">2</a>
-                    <a href="#">3</a>
-                    <a href="#">4</a>
-                    <a href="#">5</a>
-                    <a href="#">下一页</a>
-                </div>
-            </form>
-        </div>
-        <!--主要区域结束-->
-        <div id="footer">
-            <p>[源自北美的技术，最优秀的师资，最真实的企业环境，最适用的实战项目]</p>
-            <p>版权所有(C)云科技有限公司 </p>
-        </div>
-    </body>
+        })
+
+
+    }
+
+//    添加新的roleInfo
+    function addNewRoleInfo(roleInfo) {
+
+        var moduleList=roleInfo.moduleInfoList;
+
+
+        var  tr=$("<tr class='text'></tr>").attr("id",roleInfo.roleId);
+        var td0=$("<td></td>").appendTo(tr);
+        $("<a href='##'></a>").html(roleInfo.roleId).appendTo(td0);
+        $("<td></td>").html(roleInfo.name).appendTo(tr);
+        var td1=$("<td></td>").appendTo(tr);
+        for (var i=0;i<moduleList.length;i++){
+            $("<a></a>").html(moduleList[i].name).appendTo(td1);
+            $("<a></a>").html("      ").appendTo(td1);
+        }
+        var td2=$("<td></td>").appendTo(tr);
+        $("<input type='button' value='修改' id='updateRole' class='btn_modify'/>").attr("roleId",roleInfo.roleId).click(updateRole).appendTo(td2);
+        $("<input type='button' value='删除' id='deleteRole' class='btn_delete'/>").attr("roleId",roleInfo.roleId).click(deleteRole).appendTo(td2);
+
+        $("#datalist").append(tr);
+    }
+
+//点击修改
+    var updateRole=function () {
+        var r = window.confirm("确定要修改此角色吗？");
+
+        $.ajax({
+            url:"/showRoleModi",
+            type:"post",
+            data:{
+                roleId:$(this).attr("roleId")
+            },
+            success:function (result) {
+                if (result.data==1){
+                    window.location.href="/toRoleModi";
+                }
+            }
+        })
+    }
+
+
+//    删除
+   var deleteRole =function () {
+        var r = window.confirm("确定要删除此角色吗？");
+        $.ajax({
+            url:"/deleteRole",
+            type:"post",
+            data:{
+              roleId:$(this).attr("roleId")
+            },
+            success:function (result) {
+                if (result.data==1){
+                    $(".text").remove();
+                    $(".split").remove();
+                    selectAllRoleInfo();
+
+                }
+            }
+        })
+
+        document.getElementById("operate_result_info").style.display = "block";
+    }
+
+
+
+
+
+
+    //分页
+    function splitePage(number) {
+        var str = $("<div class='split'></div>");
+        $("<a href='#'></a>").html("首页").appendTo(str);
+        $("<a href='#'></a>").html("上一页").appendTo(str);
+        for (var num = 1; num <= number; num++) {
+            $("<a id='pageNum' href='###'></a>").html(num).appendTo(str).attr("num", num).click(page);
+        }
+        $("<a href='#'></a>").html("下一页").appendTo(str);
+        $("<a href='#'></a>").html("末页").appendTo(str);
+        $("#pages").append(str)
+
+    }
+
+    //分页的点击事件
+    var page= function() {
+        $(".color").removeAttr("class");
+        $(this).attr("class","color");
+        var number = $(this).attr("num");
+
+        $(".text").remove();
+        $.ajax({
+            url: "/selectAllRoleInfo",
+            type:"post",
+            success: function (res) {
+                var CostList = res.data;
+                for (var i = 4 * (number - 1); i < 4 * number; i++) {
+                    var msg = CostList[i];
+                    addNewRoleInfo(msg)
+                }
+            }
+        })
+
+    }
+
+
+    selectAllRoleInfo();
+</script>
 </html>

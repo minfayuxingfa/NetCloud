@@ -5,17 +5,60 @@
     <id column="role_id" jdbcType="INTEGER" property="roleId" />
     <result column="name" jdbcType="VARCHAR" property="name" />
   </resultMap>
+
+  <resultMap id="bs" type="com.lanou.bean.RoleInfo">
+    <id column="role_id" jdbcType="INTEGER" property="roleId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+
+    <collection property="moduleInfoList" column="role_id" javaType="ArrayList"
+                select="com.lanou.mapper.ModuleInfoMapper.findModuleByRoleId"/>
+  </resultMap>
+
   <sql id="Base_Column_List">
     role_id, name
   </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="bs">
     select 
     <include refid="Base_Column_List" />
     from role_info
     where role_id = #{roleId,jdbcType=INTEGER}
   </select>
+  <insert id="insertRM">
+    insert into role_module (role_id, module_id)
+    values (#{roleId,jdbcType=INTEGER}, #{moduleId,jdbcType=INTEGER})
+  </insert>
+  <select id="selectPrimaryKey" parameterType="com.lanou.bean.RoleInfo" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from role_info
+    where name = #{name}
+  </select>
+
+  <select id="selectRoleInfosByAdminId" parameterType="java.lang.Integer" resultMap="bs">
+    select
+    <include refid="Base_Column_List" />
+    from role_info
+    where role_id IN (SELECT role_id FROM admin_role WHERE admin_id=#{adminId})
+  </select>
+
+  <select id="findRoleByModuleId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from role_info
+    where role_id IN (SELECT role_id FROM role_module WHERE module_id=#{moduleId})
+  </select>
+
+  <select id="selectAllRoleInfo" parameterType="com.lanou.bean.RoleInfo" resultMap="bs">
+    select
+    <include refid="Base_Column_List" />
+    from role_info
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from role_info
+    where role_id = #{roleId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteRMByPrimaryKey" parameterType="java.lang.Integer">
+    delete from role_module
     where role_id = #{roleId,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.lanou.bean.RoleInfo">

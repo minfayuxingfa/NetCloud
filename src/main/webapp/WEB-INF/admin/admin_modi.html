@@ -5,20 +5,7 @@
         <title></title>
         <link type="text/css" rel="stylesheet" media="all" href="../styles/global.css" />
         <link type="text/css" rel="stylesheet" media="all" href="../styles/global_color.css" />
-        <script language="javascript" type="text/javascript">
-            //保存成功的提示消息
-            function showResult() {
-                showResultDiv(true);
-                window.setTimeout("showResultDiv(false);", 3000);
-            }
-            function showResultDiv(flag) {
-                var divResult = document.getElementById("save_result_info");
-                if (flag)
-                    divResult.style.display = "block";
-                else
-                    divResult.style.display = "none";
-            }
-        </script>
+        <script src="/jquery-3.2.1.js"></script>
     </head>
     <body>
         <!--Logo区域开始-->
@@ -46,48 +33,47 @@
         <!--主要区域开始-->
         <div id="main">            
             <div id="save_result_info" class="save_success">保存成功！</div>
-            <form action="" method="" class="main_form">
                     <div class="text_info clearfix"><span>姓名：</span></div>
                     <div class="input_info">
-                        <input type="text" value="张三" />
+                        <input type="text" id="name"/>
                         <span class="required">*</span>
                         <div class="validate_msg_long error_msg">20长度以内的汉字、字母、数字的组合</div>
                     </div>
                     <div class="text_info clearfix"><span>管理员账号：</span></div>
-                    <div class="input_info"><input type="text" readonly="readonly" class="readonly" value="admin1"  /></div>
+                    <div class="input_info"><input type="text" readonly="readonly" class="readonly" id="adminCode"  /></div>
                     <div class="text_info clearfix"><span>电话：</span></div>
                     <div class="input_info">
-                        <input type="text" value="13111111111"  />
+                        <input type="text" id="telephone" />
                         <span class="required">*</span>
                         <div class="validate_msg_long error_msg">正确的电话号码格式：手机或固话</div>
                     </div>
                     <div class="text_info clearfix"><span>Email：</span></div>
                     <div class="input_info">
-                        <input type="text" class="width200" value="aa@aa.com"/>
+                        <input type="text" class="width200" id="email"/>
                         <span class="required">*</span>
                         <div class="validate_msg_medium error_msg">50长度以内，正确的 email 格式</div>
                     </div>
                     <div class="text_info clearfix"><span>角色：</span></div>
                     <div class="input_info_high">
-                        <div class="input_info_scroll">
-                            <ul>
-                                <li><input type="checkbox" />超级管理员</li>
-                                <li><input type="checkbox" />账务账号管理员</li>
-                                <li><input type="checkbox" />业务账号管理员</li>
-                                <li><input type="checkbox" />账务账号管理员</li>
-                                <li><input type="checkbox" />业务账号管理员</li>
-                                <li><input type="checkbox" />账务账号管理员</li>
-                                <li><input type="checkbox" />业务账号管理员</li>
-                            </ul>
+                        <div class="input_info_scroll" id="role">
+                            <!--<ul>-->
+                                <!--<li><input type="checkbox" />超级管理员</li>-->
+                                <!--<li><input type="checkbox" />账务账号管理员</li>-->
+                                <!--<li><input type="checkbox" />业务账号管理员</li>-->
+                                <!--<li><input type="checkbox" />账务账号管理员</li>-->
+                                <!--<li><input type="checkbox" />业务账号管理员</li>-->
+                                <!--<li><input type="checkbox" />账务账号管理员</li>-->
+                                <!--<li><input type="checkbox" />业务账号管理员</li>-->
+                            <!--</ul>-->
                         </div>
                         <span class="required">*</span>
                         <div class="validate_msg_tiny error_msg">至少选择一个</div>
                     </div>
                     <div class="button_info clearfix">
                         <input type="button" value="保存" class="btn_save" onclick="showResult();" />
-                        <input type="button" value="取消" class="btn_save" />
+                        <input type="button" value="取消" class="btn_save" onclick="cancelModiAdmin()"/>
                     </div>
-                </form>  
+
         </div>
         <!--主要区域结束-->
         <div id="footer">
@@ -96,4 +82,91 @@
             <span>版权所有(C)云科技有限公司 </span>
         </div>
     </body>
+    <script language="javascript" type="text/javascript">
+        function rollBackAdmin() {
+            $.ajax({
+                url:"/selectAllRoleInfo",
+                type:"post",
+                success:function (result) {
+                    var RoleInfos=result.data;
+                    var ul =$("<ul></ul>");
+                    for (var i=0;i<RoleInfos.length;i++){
+                        var li =$("<li></li>").appendTo(ul);
+                        $("<input class='checking' type='checkbox'/>").attr("id",RoleInfos[i].roleId).appendTo(li);
+                        $("<a></a>").html(RoleInfos[i].name).appendTo(li);
+                    }
+                    $("#role").append(ul);
+                }
+            });
+            $.ajax({
+                url:"/rollBackAdmin",
+                success:function (result) {
+                  var roleInfos= result.data.roleInfos;
+                     $("#name").val(result.data.name);
+                     $("#adminCode").val(result.data.adminCode);
+                     $("#telephone").val(result.data.telephone);
+                     $("#email").val(result.data.email);
+                    for (var i=0;i<roleInfos.length;i++) {
+                        $("#" + roleInfos[i].roleId).attr("checked", "checked");
+                    }
+                }
+            })
+        }
+
+
+
+//取消点击事件
+        function cancelModiAdmin() {
+
+            $.ajax({
+                url:"/adminList",
+                success:function (result) {
+
+                    if (result.data==1){
+                        window.location.href="/toAdmin";
+                    }
+                }
+            })
+        }
+
+
+        //保存成功的提示消息
+        function showResult() {
+            var roleIdList = [];
+
+            $("input:checked").each(function () {
+                roleIdList.push($(this).attr("id"))
+            })
+
+            $.ajax({
+                url: "/saveModiAdmin",
+                type: "post",
+                traditional:true,
+                data: {
+                    name: $("#name").val(),
+                    adminCode: $("#adminCode").val(),
+                    telephone: $("#telephone").val(),
+                    email: $("#email").val(),
+                    roleIdList: roleIdList
+                },
+                success: function (result) {
+
+if (result.data==1){
+    showResultDiv(true);
+    window.setTimeout("showResultDiv(false);", 3000);
+}
+
+                }
+            });
+        }
+
+        function showResultDiv(flag) {
+            var divResult = document.getElementById("save_result_info");
+            if (flag)
+                divResult.style.display = "block";
+            else
+                divResult.style.display = "none";
+        }
+        rollBackAdmin()
+    </script>
 </html>

@@ -171,13 +171,17 @@ public class ServiceController {
     // 多条件查询
     @ResponseBody
     @RequestMapping(value = "/multiSituationSelect", method = RequestMethod.POST)
-    public AjaxResult multiSituationSelect(Service service) {
-
-        System.out.println(service.getAccountId());
-        System.out.println(service.getStatus());
-        System.out.println(service.getOsUsername());
-        System.out.println(service.getUnixHost());
-        List<Service> services = serviceService.selectServiceSelected(service);
+    public AjaxResult multiSituationSelect(@RequestParam("osUsername") String osUsername,
+                                           @RequestParam("unixHost") String unixHost,
+                                           @RequestParam("idcardNo") String idcardNo,
+                                           @RequestParam("status") String status) {
+        System.out.println(11);
+        System.out.println(osUsername);
+        System.out.println(unixHost);
+        System.out.println(idcardNo);
+        System.out.println(status);
+        List<Service> services = serviceService.selectServiceSelected(osUsername,unixHost,idcardNo,status);
+        System.out.println(22222);
         return new AjaxResult(services);
     }
 

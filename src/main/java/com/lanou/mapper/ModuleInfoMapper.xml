@@ -14,6 +14,19 @@
     from module_info
     where module_id = #{moduleId,jdbcType=INTEGER}
   </select>
+  <select id="findModuleByRoleId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from module_info
+    where module_id IN (SELECT module_id FROM role_module WHERE role_id=#{roleId})
+  </select>
+
+  <select id="findAllModule" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from module_info
+
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from module_info
     where module_id = #{moduleId,jdbcType=INTEGER}

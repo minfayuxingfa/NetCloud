@@ -62,5 +62,30 @@
             }
         })
     })
+    //跳到管理员
+    $("#admin_list").click(function () {
+              $.ajax({
+            url:"/adminList",
+            success:function (result) {
+
+                if (result.data==1){
+                    window.location.href="/toAdmin";
+                }
+            }
+        })
+    })
+
+    //跳到角色管理
+    $("#role_list").click(function () {
+              $.ajax({
+            url:"/roleList",
+            success:function (result) {
+
+                if (result.data==1){
+                    window.location.href="/toRole";
+                }
+            }
+        })
+    })
 </script>
 </html>

@@ -168,23 +168,23 @@
     select
     <include refid="Base_Column_List" />
     from service
-    WHERE
-    <trim suffixOverrides="AND">
+    <where>
 
-      <if test="accountId != null">
-       account_id =#{accountId,jdbcType=INTEGER} AND
+      <if test="idcardNo != ''">
+       account_id = (SELECT account_id FROM account WHERE idcard_no =#{idcardNo})
       </if>
-      <if test="unixHost != null">
-       unix_host= #{unixHost,jdbcType=VARCHAR} AND
+      <if test="unixHost != ''">
+        AND  unix_host= #{unixHost}
       </if>
-      <if test="osUsername != null">
-        os_username=#{osUsername,jdbcType=VARCHAR} AND
-      </if>
-
-      <if test="status != null">
-        status=#{status,jdbcType=CHAR} AND
+      <if test="osUsername != ''">
+        AND os_username=#{osUsername}
       </if>
 
-    </trim>
+      <if test="status != ''">
+        AND status=#{status}
+      </if>
+
+    </where>
   </select>
+
 </mapper>

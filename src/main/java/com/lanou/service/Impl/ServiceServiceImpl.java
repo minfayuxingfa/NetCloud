@@ -6,6 +6,7 @@ import com.lanou.bean.Account;
 import com.lanou.bean.Service;
 import com.lanou.mapper.ServiceMapper;
 import com.lanou.service.ServiceService;
+import org.apache.ibatis.annotations.Param;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -24,10 +25,16 @@ public class ServiceServiceImpl implements ServiceService {
         return services;
     }
 
-    public List<Service> selectServiceSelected(Service service) {
-        List<Service> services = serviceMapper.selectServiceSelected(service);
+    public List<Service> selectServiceSelected(String osUsername,
+                                              String unixHost,
+                                              String idcardNo,
+                                              String status) {
+
+        List<Service> services = serviceMapper.selectServiceSelected(osUsername,unixHost,idcardNo,status);
         return services;
     }
+
+
 
     public int insertSelective(Service service) {
         int i = serviceMapper.insertSelective(service);

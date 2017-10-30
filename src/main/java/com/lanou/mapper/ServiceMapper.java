@@ -1,6 +1,7 @@
 package com.lanou.mapper;
 
 import com.lanou.bean.Service;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -17,6 +18,10 @@ public interface ServiceMapper {
 
     int updateByPrimaryKey(Service record);
 
-    List<Service>selectAllService();
-    List<Service>selectServiceSelected(Service service);
+    List<Service> selectAllService();
+
+    List<Service> selectServiceSelected(@Param("osUsername") String osUsername,
+                                        @Param("unixHost") String unixHost,
+                                        @Param("idcardNo") String idcardNo,
+                                        @Param("status") String status);
 }
